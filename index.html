@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 4: Social Groups (Slow British)</title>
+    <style>
+        :root {
+            --primary: #283593; /* Indigo */
+            --secondary: #00695c; /* Teal */
+            --bg: #e8eaf6;
+            --card: #ffffff;
+            --text: #37474f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .container {
+            background: var(--card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 750px;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); margin-bottom: 5px; }
+        p { color: #546e7a; }
+
+        /* Syllable Colors */
+        .syl-1 { color: #d32f2f; } /* Red */
+        .syl-2 { color: #1976d2; } /* Blue */
+        .syl-3 { color: #388e3c; } /* Green */
+        .syl-4 { color: #f57c00; } /* Orange */
+        .syl-5 { color: #7b1fa2; } /* Purple */
+        .syl-6 { color: #00796b; } /* Teal */
+
+        .word-display {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 15px;
+            border: 3px dashed #cfd8dc;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        /* Inputs & Buttons */
+        input {
+            padding: 12px;
+            margin: 8px;
+            border: 2px solid #b0bec5;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 200px;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 5px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        
+        .btn-core { background-color: #43a047; }
+        .btn-inter { background-color: #fb8c00; }
+        .btn-adv { background-color: #e53935; }
+
+        .btn-mic {
+            background-color: var(--secondary);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .mic-listening { animation: pulse 1.5s infinite; background-color: #d32f2f; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+
+        /* Game UI */
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            background: #e8eaf6;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .option-card {
+            background: white;
+            border: 2px solid #eeeeee;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            text-align: left;
+        }
+        .option-card:hover { border-color: var(--primary); background: #e8eaf6; }
+
+        .hidden { display: none !important; }
+        .feedback { min-height: 30px; margin-top: 15px; font-weight: bold; font-size: 1.2rem; }
+
+        /* Table */
+        .table-wrapper { max-height: 300px; overflow-y: auto; margin: 20px 0; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: var(--primary); color: white; position: sticky; top: 0; padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Screen 1: Registration -->
+    <div id="screen-login">
+        <h1>Module 4: Social Groups</h1>
+        <p>British English • Slow Pace</p>
+        <br>
+        <input type="text" id="sName" placeholder="Student Name">
+        <br>
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <input type="text" id="sClass" placeholder="Class (e.g. 4A)" style="width: 100px;">
+            <input type="text" id="sNo" placeholder="Class No." style="width: 100px;">
+        </div>
+        <br>
+        <p>Select Challenge Level:</p>
+        <button class="btn btn-core" onclick="startGame('Core')">Core (★)</button>
+        <button class="btn btn-inter" onclick="startGame('Intermediate')">Intermediate (★★)</button>
+        <button class="btn btn-adv" onclick="startGame('Advanced')">Advanced (★★★)</button>
+    </div>
+
+    <!-- Screen 2: Game Loop -->
+    <div id="screen-game" class="hidden">
+        <div class="scoreboard">
+            <span>🗣️ Speak: <span id="score-speak">0</span></span>
+            <span>🧩 Match: <span id="score-match">0</span></span>
+            <span>Word: <span id="progress-text">1/10</span></span>
+        </div>
+
+        <!-- Phase 1: Speaking -->
+        <div id="phase-speak">
+            <h2>Step 1: Listen & Read Aloud</h2>
+            <div id="word-syllables" class="word-display"></div>
+            
+            <button class="btn" onclick="playTTS()">🔊 Listen (Slowly)</button>
+            <br>
+            <button class="btn btn-mic" id="mic-btn" onclick="activateMic()">🎤</button>
+            <div id="mic-status" style="margin-top:10px; color:#888;">Tap mic to speak</div>
+            <div id="feedback-speak" class="feedback"></div>
+        </div>
+
+        <!-- Phase 2: Matching -->
+        <div id="phase-match" class="hidden">
+            <h2>Step 2: Match Meaning</h2>
+            <div id="match-word" style="font-size: 2.2rem; font-weight: bold; color: var(--primary); margin: 20px 0;"></div>
+            <div id="options-container" class="options-grid"></div>
+            <div id="feedback-match" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- Screen 3: Results -->
+    <div id="screen-result" class="hidden">
+        <h1>Challenge Complete!</h1>
+        <h2>Total Score: <span id="final-total"></span></h2>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>Speak</th>
+                        <th>Match</th>
+                    </tr>
+                </thead>
+                <tbody id="result-tbody"></tbody>
+            </table>
+        </div>
+
+        <button class="btn" onclick="exportCSV()">📥 Export Results (CSV)</button>
+        <button class="btn" onclick="location.reload()" style="background-color: #78909c;">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // --- Updated Vocabulary Database ---
+    const vocabData = {
+        Core: [
+            { w: "the elderly", syl: ["the", " ", "el", "der", "ly"], m: "長者 (Old people)" },
+            { w: "the youth", syl: ["the", " ", "youth"], m: "青年 (Young people)" },
+            { w: "the patients", syl: ["the", " ", "pa", "tients"], m: "病人 (People receiving medical care)" },
+            { w: "the impoverished", syl: ["the", " ", "im", "pov", "er", "ished"], m: "赤貧人士 (Very poor people)" },
+            { w: "the marginalized", syl: ["the", " ", "mar", "gin", "al", "ized"], m: "邊緣社群 (People treated as unimportant)" },
+            { w: "the chronically ill", syl: ["the", " ", "chron", "i", "cal", "ly", " ", "ill"], m: "長期病患者 (People with long-term sickness)" },
+            { w: "single parents", syl: ["sin", "gle", " ", "par", "ents"], m: "單親家長 (One parent raising children)" },
+            { w: "the ethnic minority", syl: ["the", " ", "eth", "nic", " ", "mi", "nor", "i", "ty"], m: "少數族裔 (Groups different from the majority)" },
+            { w: "the expatriate", syl: ["the", " ", "ex", "pa", "tri", "ate"], m: "外籍人士 (People living in a foreign country)" }
+        ],
+        // Retained previous vocabulary for structure, can be updated later
+        Intermediate: [
+            { w: "Shanty town", syl: ["Shan", "ty", " ", "town"], m: "貧民窟/寮屋區 (Area with poor makeshift houses)" },
+            { w: "Unemployment", syl: ["Un", "em", "ploy", "ment"], m: "失業 (State of not having a job)" },
+            { w: "Illiteracy", syl: ["Il", "lit", "er", "a", "cy"], m: "文盲 (Inability to read or write)" },
+            { w: "Bribery", syl: ["Brib", "er", "y"], m: "賄賂 (Giving money to dishonestly influence someone)" },
+            { w: "Illegal immigration", syl: ["Il", "le", "gal", " ", "im", "mi", "gra", "tion"], m: "非法移民 (Moving to a country unlawfully)" },
+            { w: "Addiction", syl: ["Ad", "dic", "tion"], m: "上癮 (Unable to stop doing/using something)" }
+        ],
+        Advanced: [
+            { w: "Wars", syl: ["Wars"], m: "戰爭 (Armed conflict between groups)" },
+            { w: "Theft", syl: ["Theft"], m: "偷竊 (Stealing property)" },
+            { w: "Robbery", syl: ["Rob", "ber", "y"], m: "搶劫 (Stealing with force or threat)" },
+            { w: "Child labour", syl: ["Child", " ", "la", "bour"], m: "童工 (Illegal employment of children)" },
+            { w: "Road accidents", syl: ["Road", " ", "ac", "ci", "dents"], m: "交通意外 (Crashes involving vehicles)" }
+        ]
+    };
+
+    // --- State ---
+    let session = {
+        name: "", class: "", no: "", level: "",
+        queue: [], idx: 0,
+        scoreSpeak: 0, scoreMatch: 0,
+        logs: []
+    };
+    let attempts = 0;
+    let recognition;
+    let isSpeaking = false;
+    let availableVoices = [];
+
+    // --- Voice Setup ---
+    window.speechSynthesis.onvoiceschanged = () => {
+        availableVoices = window.speechSynthesis.getVoices();
+    };
+
+    function getBritishVoice() {
+        if (availableVoices.length === 0) availableVoices = window.speechSynthesis.getVoices();
+        
+        // Priority: GB/UK voice
+        const britishVoice = availableVoices.find(voice => 
+            voice.lang.includes('GB') || 
+            voice.name.includes('UK') || 
+            voice.name.includes('British')
+        );
+        
+        // Fallback: Any English voice
+        return britishVoice || availableVoices.find(voice => voice.lang.includes('en')) || null;
+    }
+
+    // --- Init ---
+    function startGame(level) {
+        const n = document.getElementById('sName').value;
+        const c = document.getElementById('sClass').value;
+        const no = document.getElementById('sNo').value;
+
+        if(!n || !c || !no) { alert("Please enter Name, Class, and Number."); return; }
+
+        session.name = n; session.class = c; session.no = no; session.level = level;
+        session.queue = vocabData[level];
+
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-game').classList.remove('hidden');
+
+        setupSpeechRecognition();
+        loadWord();
+    }
+
+    function setupSpeechRecognition() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-GB'; // Prefer British English recognition
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onresult = (e) => checkSpeech(e.results[0][0].transcript);
+            recognition.onerror = () => { 
+                document.getElementById('mic-status').innerText = "⚠️ Error. Try again.";
+                document.getElementById('mic-btn').classList.remove('mic-listening');
+                isSpeaking = false;
+            };
+            recognition.onend = () => { 
+                document.getElementById('mic-btn').classList.remove('mic-listening');
+                isSpeaking = false;
+            };
+        } else {
+            alert("Please use Google Chrome for Speech Recognition features.");
+        }
+    }
+
+    // --- Game Logic ---
+    function loadWord() {
+        if (session.idx >= session.queue.length) {
+            endGame();
+            return;
+        }
+
+        const current = session.queue[session.idx];
+        attempts = 0;
+        
+        document.getElementById('score-speak').innerText = session.scoreSpeak;
+        document.getElementById('score-match').innerText = session.scoreMatch;
+        document.getElementById('progress-text').innerText = `${session.idx + 1}/${session.queue.length}`;
+        
+        document.getElementById('phase-speak').classList.remove('hidden');
+        document.getElementById('phase-match').classList.add('hidden');
+        document.getElementById('feedback-speak').innerText = "";
+        document.getElementById('mic-status').innerText = "Tap mic to speak";
+
+        // Render Syllables
+        const display = document.getElementById('word-syllables');
+        display.innerHTML = "";
+        current.syl.forEach((s, i) => {
+            const span = document.createElement('span');
+            span.innerText = s;
+            if (s.trim() !== "") span.className = `syl-${(i % 6) + 1}`;
+            display.appendChild(span);
+        });
+    }
+
+    // Phase 1: Speak
+    function playTTS() {
+        const word = session.queue[session.idx].w;
+        const utter = new SpeechSynthesisUtterance(word);
+        
+        // 1. British Voice
+        const voice = getBritishVoice();
+        if (voice) utter.voice = voice;
+
+        // 2. Slow Speed (0.6)
+        utter.rate = 0.6; 
+        
+        window.speechSynthesis.speak(utter);
+    }
+
+    function activateMic() {
+        if (isSpeaking) return;
+        recognition.start();
+        isSpeaking = true;
+        document.getElementById('mic-btn').classList.add('mic-listening');
+        document.getElementById('mic-status').innerText = "Listening (British English)...";
+    }
+
+    function checkSpeech(transcript) {
+        const target = session.queue[session.idx].w.toLowerCase();
+        const said = transcript.toLowerCase().replace(/[^a-z0-9 ]/g, "");
+        const cleanTarget = target.replace(/[^a-z0-9 ]/g, "");
+
+        if (said.includes(cleanTarget) || cleanTarget.includes(said)) {
+            document.getElementById('feedback-speak').innerText = `✅ Good! You said: "${transcript}"`;
+            document.getElementById('feedback-speak').style.color = "green";
+            session.scoreSpeak++;
+            session.logs.push({ w: session.queue[session.idx].w, s: 1, m: 0 });
+            setTimeout(startMatch, 1500);
+        } else {
+            attempts++;
+            if (attempts < 2) {
+                document.getElementById('feedback-speak').innerText = `⚠️ Try again. You said: "${transcript}"`;
+                document.getElementById('feedback-speak').style.color = "orange";
+            } else {
+                document.getElementById('feedback-speak').innerText = `❌ Skipped. Word was: ${session.queue[session.idx].w}`;
+                document.getElementById('feedback-speak').style.color = "red";
+                session.logs.push({ w: session.queue[session.idx].w, s: 0, m: 0 });
+                setTimeout(startMatch, 2000);
+            }
+        }
+    }
+
+    // Phase 2: Match
+    function startMatch() {
+        document.getElementById('phase-speak').classList.add('hidden');
+        document.getElementById('phase-match').classList.remove('hidden');
+        document.getElementById('feedback-match').innerText = "";
+        attempts = 0;
+
+        const current = session.queue[session.idx];
+        document.getElementById('match-word').innerText = current.w;
+
+        // Distractors logic
+        let all = [...vocabData.Core, ...vocabData.Intermediate, ...vocabData.Advanced];
+        let distractors = all.filter(x => x.w !== current.w).sort(() => 0.5 - Math.random()).slice(0, 2);
+        let opts = [current, ...distractors].sort(() => 0.5 - Math.random());
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
+        
+        opts.forEach(o => {
+            const d = document.createElement('div');
+            d.className = 'option-card';
+            d.innerText = o.m;
+            d.onclick = () => checkMatch(d, o.w === current.w);
+            container.appendChild(d);
+        });
+    }
+
+    function checkMatch(div, isCorrect) {
+        if (div.style.opacity === "0.5") return;
+
+        if (isCorrect) {
+            div.style.background = "#c8e6c9";
+            div.style.borderColor = "green";
+            document.getElementById('feedback-match').innerText = "✅ Correct!";
+            document.getElementById('feedback-match').style.color = "green";
+            session.scoreMatch++;
+            session.logs[session.logs.length - 1].m = 1;
+            disableOpts();
+            setTimeout(nextWord, 1000);
+        } else {
+            attempts++;
+            div.style.background = "#ffcdd2";
+            div.style.opacity = "0.5";
+            if (attempts < 2) {
+                document.getElementById('feedback-match').innerText = "⚠️ Wrong. 1 attempt left.";
+                document.getElementById('feedback-match').style.color = "orange";
+            } else {
+                document.getElementById('feedback-match').innerText = "❌ Incorrect.";
+                document.getElementById('feedback-match').style.color = "red";
+                disableOpts();
+                setTimeout(nextWord, 1500);
+            }
+        }
+    }
+
+    function disableOpts() {
+        document.querySelectorAll('.option-card').forEach(d => {
+            d.onclick = null;
+            if(d.style.background !== "rgb(200, 230, 201)") d.style.opacity = "0.5";
+        });
+    }
+
+    function nextWord() {
+        session.idx++;
+        loadWord();
+    }
+
+    // --- End Game ---
+    function endGame() {
+        document.getElementById('screen-game').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+        
+        document.getElementById('final-total').innerText = (session.scoreSpeak + session.scoreMatch) + " / " + (session.queue.length * 2);
+
+        const tbody = document.getElementById('result-tbody');
+        tbody.innerHTML = "";
+        session.logs.forEach(l => {
+            tbody.innerHTML += `<tr><td>${l.w}</td><td>${l.s?'✅':'❌'}</td><td>${l.m?'✅':'❌'}</td></tr>`;
+        });
+    }
+
+    function exportCSV() {
+        let csv = "\uFEFFStudent,Class,No,Level,Word,Speak,Match,Total\n";
+        session.logs.forEach(l => {
+            csv += `"${session.name}","${session.class}","${session.no}","${session.level}","${l.w}",${l.s},${l.m},${l.s+l.m}\n`;
+        });
+        csv += `SUMMARY,${session.class},${session.no},${session.level},ALL,${session.scoreSpeak},${session.scoreMatch},${session.scoreSpeak+session.scoreMatch}\n`;
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${session.name}_SocialGroups_Results.csv`;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
+</body>
+</html>
